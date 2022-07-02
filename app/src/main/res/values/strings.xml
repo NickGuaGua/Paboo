@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">Paboo</string>
+    <string name="tab_home">Home</string>
+    <string name="tab_category">Category</string>
+
+    <string name="refresh">Refresh</string>
+
+    <string name="error_no_data">No content</string>
+    <string name="error_no_wifi">No internet connection</string>
+    <string name="error_general">Something went wrong</string>
+</resources>
