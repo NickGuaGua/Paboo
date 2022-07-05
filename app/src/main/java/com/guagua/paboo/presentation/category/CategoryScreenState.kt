@@ -25,8 +25,6 @@ class CategoryScreenState(
 ) : BaseComposableState<CategoryState, CategoryIntent>(viewModel, scope, navigator) {
 
     val currentPage get() =  pagerState.currentPage
-    val currentCategory
-        get() = viewModel.state.value.categories[currentPage]
 
     fun scrollToPage(page: Int) {
         launch { pagerState.scrollToPage(page) }

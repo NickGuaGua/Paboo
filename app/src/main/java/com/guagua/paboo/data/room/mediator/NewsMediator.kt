@@ -6,10 +6,8 @@ import androidx.paging.PagingState
 import androidx.paging.RemoteMediator
 import androidx.room.withTransaction
 import com.guagua.data.source.NewsDataSource
-import com.guagua.paboo.data.model.Article
-import com.guagua.paboo.data.model.Category
-import com.guagua.paboo.data.model.CategoryNewsKey
-import com.guagua.paboo.data.model.Country
+import com.guagua.paboo.data.PabooException
+import com.guagua.paboo.data.model.*
 import com.guagua.paboo.data.room.PabooDatabase
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
@@ -50,15 +48,19 @@ class NewsMediator(
                 LoadType.PREPEND -> return MediatorResult.Success(endOfPaginationReached = true)
             }
 
-            val response = newsDataSource.getTopHeadlines(
-                country.name,
-                category.name,
-                null,
-                state.config.pageSize,
-                loadKey
+            val response = ArticleResponse.create(
+                newsDataSource.getTopHeadlines(
+                    country.name,
+                    category.name,
+                    null,
+                    state.config.pageSize,
+                    loadKey
+                ),
+                country,
+                category
             ).also { lastUpdateTime = System.currentTimeMillis() }
 
-            val isEndOfPaginationReached = (response.totalResults ?: 0) <= state.config.pageSize * loadKey
+            val isEndOfPaginationReached = response.totalResults <= state.config.pageSize * loadKey
 
             database.withTransaction {
                 if (loadType == LoadType.REFRESH) {
@@ -71,7 +73,12 @@ class NewsMediator(
                 } else {
                     remoteKeyDao.insertOrReplace(CategoryNewsKey(country, category, loadKey))
                 }
-                newsDao.insertArticles(response.articles.map { Article.create(it, country, category) })
+
+                newsDao.insertArticles(response.articles)
+            }
+
+            if (response.isError()) {
+                throw PabooException(response.errorCode, response.errorMessage)
             }
 
             MediatorResult.Success(
@@ -79,6 +86,7 @@ class NewsMediator(
             )
         } catch (e: Exception) {
             resetCache()
+            Timber.e(e)
             MediatorResult.Error(e)
         }
     }

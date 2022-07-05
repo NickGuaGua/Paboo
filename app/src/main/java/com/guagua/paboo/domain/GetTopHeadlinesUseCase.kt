@@ -18,6 +18,6 @@ class GetTopHeadlinesUseCase @Inject constructor(
         pageSize: Int = 20,
         page: Int = 1
     ) = withContext(dispatcher) {
-        repository.getTopHeadlinesPagingFlow(country, category, null, page, pageSize)
+        repository.getTopHeadlinesFlow(country, category, null, page, pageSize)
     }
 }

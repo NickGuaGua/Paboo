@@ -1,4 +1,4 @@
-package com.guagua.paboo.data.room
+package com.guagua.paboo.data.room.dao
 
 import androidx.room.Dao
 import androidx.room.Insert

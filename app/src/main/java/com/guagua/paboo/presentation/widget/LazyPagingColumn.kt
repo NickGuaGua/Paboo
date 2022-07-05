@@ -49,17 +49,20 @@ fun <T : Any> LazyPagingColumn(
                 items(pagingItems) { item ->
                     item?.let { content(it) }
                 }
+                if (pagingItems.isAppendLoading()) {
+                    item {
+                        Loading(
+                            modifier = Modifier
+                                .wrapContentSize()
+                                .align(Alignment.Center),
+                            isVisible = pagingItems.isAppendLoading()
+                        )
+                    }
+                }
                 append?.let {
                     item { it.invoke(this) }
                 }
             }
-
-            Loading(
-                modifier = Modifier
-                    .wrapContentSize()
-                    .align(Alignment.Center),
-                isVisible = pagingItems.isAppendLoading()
-            )
 
             if (pagingItems.isEmpty()) {
                 ErrorContent(
@@ -72,16 +75,17 @@ fun <T : Any> LazyPagingColumn(
             }
 
             pagingItems.getRefreshError()?.apply {
+                val errorMessage = this.getErrorMessage(LocalContext.current)
                 if (pagingItems.isEmpty()) {
                     ErrorContent(
                         modifier = Modifier
                             .wrapContentSize()
                             .align(Alignment.Center),
                         icon = R.drawable.ic_warning,
-                        text = stringResource(id = R.string.error_general)
+                        text = errorMessage
                     )
                 } else {
-                    Toast.makeText(context, stringResource(id = R.string.error_general), Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, errorMessage, Toast.LENGTH_SHORT).show()
                 }
             }
         }

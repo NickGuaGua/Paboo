@@ -9,7 +9,6 @@ import androidx.paging.cachedIn
 import com.guagua.paboo.data.model.Article
 import com.guagua.paboo.data.model.Category
 import com.guagua.paboo.data.model.Country
-import com.guagua.paboo.data.paging.PagingFlow
 import com.guagua.paboo.domain.GetTopHeadlinesUseCase
 import com.guagua.paboo.presentation.base.BaseViewModel
 import com.guagua.paboo.presentation.navigation.Screen
@@ -60,7 +59,7 @@ class CategoryViewModel @Inject constructor(
 
     fun getTopHeadlines(category: Category) = launch {
         categoryFlowMap.getOrPut(category) {
-            getTopHeadlinesUseCase(Country.TW, category).flow.cachedIn(viewModelScope)
+            getTopHeadlinesUseCase(Country.TW, category).cachedIn(viewModelScope)
         }
         _state.update { it.copy(categoryFlowMap = categoryFlowMap) }
     }

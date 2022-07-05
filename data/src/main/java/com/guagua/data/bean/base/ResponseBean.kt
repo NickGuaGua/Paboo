@@ -2,7 +2,7 @@ package com.guagua.data.bean.base
 
 import com.google.gson.annotations.SerializedName
 
-open class ResponseBean() {
+abstract class ResponseBean {
     @SerializedName("status")
     val status: String? = null
     @SerializedName("totalResults")

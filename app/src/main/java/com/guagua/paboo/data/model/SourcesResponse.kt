@@ -9,7 +9,7 @@ data class SourcesResponse(
     companion object {
         internal fun create(bean: SourcesResponseBean) = with(bean) {
             SourcesResponse(
-                sources.map { SourceDetail.create(it) },
+                sources?.map { SourceDetail.create(it) } ?: emptyList(),
                 totalResults ?: 0
             )
         }

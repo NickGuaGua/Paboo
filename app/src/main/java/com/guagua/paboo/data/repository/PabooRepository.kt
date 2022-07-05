@@ -1,21 +1,24 @@
 package com.guagua.paboo.data.repository
 
+import androidx.paging.ExperimentalPagingApi
+import androidx.paging.Pager
 import androidx.paging.PagingConfig
+import androidx.paging.PagingData
 import com.guagua.data.source.NewsDataSource
 import com.guagua.paboo.data.room.mediator.NewsMediator
 import com.guagua.paboo.data.model.*
-import com.guagua.paboo.data.paging.PagingFlow
-import com.guagua.paboo.data.paging.PagingFlowImpl
 import com.guagua.paboo.data.room.PabooDatabase
+import kotlinx.coroutines.flow.Flow
 
 interface PabooRepository {
-    fun getTopHeadlinesPagingFlow(
+
+    fun getTopHeadlinesFlow(
         country: Country,
         category: Category,
         query: String?,
         page: Int,
         pageSize: Int
-    ): PagingFlow<Article>
+    ): Flow<PagingData<Article>>
 
     suspend fun getSources(
         category: Category?,
@@ -43,25 +46,21 @@ class PabooRepositoryImpl(
     private val database: PabooDatabase
 ): PabooRepository {
 
-    private val cachedPagingFlow: MutableMap<Category, PagingFlow<Article>> = mutableMapOf()
-
-    override fun getTopHeadlinesPagingFlow(
+    @OptIn(ExperimentalPagingApi::class)
+    override fun getTopHeadlinesFlow(
         country: Country,
         category: Category,
         query: String?,
         page: Int,
         pageSize: Int
-    ): PagingFlow<Article> {
-        return cachedPagingFlow.getOrPut(category) {
-            PagingFlowImpl(
-                pagingSourceFactory = {
-                    database.newsDao().queryArticles(country, category)
-                },
-                initKey = page,
-                pagingConfig = PagingConfig(pageSize = pageSize, enablePlaceholders = true),
-                remoteMediator = NewsMediator(country, category, database, remoteDataSource)
-            )
-        }
+    ): Flow<PagingData<Article>> {
+        return Pager(
+            PagingConfig(pageSize = pageSize, enablePlaceholders = true),
+            page,
+            NewsMediator(country, category, database, remoteDataSource)
+        ) {
+            database.newsDao().queryArticles(country, category)
+        }.flow
     }
 
     override suspend fun getSources(

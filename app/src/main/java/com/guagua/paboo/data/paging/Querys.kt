@@ -3,12 +3,6 @@ package com.guagua.paboo.data.paging
 import com.guagua.paboo.data.model.Category
 import com.guagua.paboo.data.model.Country
 
-data class TopHeadlinesQuery(
-    var country: Country,
-    var category: Category? = null,
-    var query: String? = null
-)
-
 data class SearchQuery(
     var query: String? = null,
     var searchIn: String? = null,

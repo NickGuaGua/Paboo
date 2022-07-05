@@ -94,11 +94,9 @@ internal class NewsDataSourceImpl(
         val response = block.invoke()
 
         if (!response.isSuccessful) {
-            throw error(response.errorBody()?.string() ?: "API response error.")
+            error(response.errorBody()?.string() ?: "API response error.")
         }
 
-        return response.body()?.let {
-            it.takeUnless { it.status != "ok" } ?: error("${it.code}: ${it.message}")
-        } ?: error("Null body")
+        return response.body() ?: error("Null body")
     }
 }
