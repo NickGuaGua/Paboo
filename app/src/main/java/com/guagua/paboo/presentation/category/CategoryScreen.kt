@@ -14,7 +14,12 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingSource
+import androidx.paging.PagingState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.google.accompanist.insets.statusBarsHeight
@@ -24,14 +29,38 @@ import com.google.accompanist.pager.rememberPagerState
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.guagua.paboo.data.model.Article
 import com.guagua.paboo.data.model.Category
+import com.guagua.paboo.data.util.MockUtil
+import com.guagua.paboo.extension.preview
 import com.guagua.paboo.presentation.base.MviViewModel
 import com.guagua.paboo.presentation.composition.LocalAppNavigator
 import com.guagua.paboo.presentation.navigation.Screen
 import com.guagua.paboo.presentation.theme.AppColor
 import com.guagua.paboo.presentation.widget.LazyPagingColumn
 import com.guagua.paboo.presentation.widget.NewsCard
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import timber.log.Timber
+
+@Preview
+@Composable
+fun CategoryScreenPreview() = preview {
+    CategoryScreen(object : MviViewModel<CategoryState, CategoryIntent> {
+        private val categories = Category.values().filter { it != Category.GENERAL }
+        override val state: StateFlow<CategoryState> = MutableStateFlow(
+            CategoryState(
+                isLoading = true,
+                categories = categories,
+                categoryFlowMap = categories.associateWith { MockUtil.getArticlePagingFlow(10) }
+            )
+        )
+
+        override fun handleIntent(intentFlow: Flow<CategoryIntent>) {}
+
+        override fun eventConsumed() {}
+    })
+}
 
 @OptIn(ExperimentalPagerApi::class)
 @Composable
@@ -44,7 +73,7 @@ fun CategoryScreen(viewModel: MviViewModel<CategoryState, CategoryIntent>) {
         screenState.handleEvent(it)
     }
 
-    Column(modifier = Modifier.background(AppColor.BrandGray)) {
+    Column(modifier = Modifier.fillMaxSize().background(AppColor.BrandGray)) {
         Spacer(modifier = Modifier
             .fillMaxWidth()
             .statusBarsHeight()
