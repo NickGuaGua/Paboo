@@ -10,24 +10,28 @@ import com.guagua.paboo.data.model.Country
 import com.guagua.paboo.data.model.Source
 
 object MockUtil {
-    fun getArticles(
-        total: Int = 10, country: Country = Country.TW, category: Category = Category.GENERAL
-    ): List<Article> {
-        return (1..total).map {
-            Article(
-                id = "id$it",
-                source = Source("sourceId$it", "source$it"),
-                author = "author$it",
-                title = "title $it",
-                description = "description $it",
-                url = "https://www.google.com?q=$it",
+    fun getArticle(
+        id: Int, country: Country = Country.TW, category: Category = Category.GENERAL
+    ): Article {
+        return Article(
+                id = "id$id",
+                source = Source("sourceId$id", "source$id"),
+                author = "author$id",
+                title = "title $id",
+                description = "description $id",
+                url = "https://www.google.com?q=$id",
                 urlToImage = "https://picsum.photos/200",
                 publishedAt = Long.MAX_VALUE,
-                content = "content $it",
+                content = "content $id",
                 country = country,
                 category = category
             )
-        }
+    }
+
+    fun getArticles(
+        total: Int = 10, country: Country = Country.TW, category: Category = Category.GENERAL
+    ): List<Article> {
+        return (1..total).map { getArticle(it, country, category) }
     }
 
     fun getArticlePagingFlow(size: Int) = Pager(PagingConfig(size), null) {

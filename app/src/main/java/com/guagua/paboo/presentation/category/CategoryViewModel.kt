@@ -45,9 +45,6 @@ class CategoryViewModel @Inject constructor(
                             ))
                         }
                     }
-                    is CategoryIntent.Refresh -> {
-
-                    }
                 }
             }
         }

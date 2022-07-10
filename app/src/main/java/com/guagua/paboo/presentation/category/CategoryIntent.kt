@@ -6,6 +6,5 @@ import com.guagua.paboo.presentation.base.ScreenIntent
 
 sealed class CategoryIntent : ScreenIntent {
     data class CategoryChanged(val category: Category) : CategoryIntent()
-    data class Refresh(val category: Category) : CategoryIntent()
     data class ClickArticle(val article: Article) : CategoryIntent()
 }
